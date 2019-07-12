@@ -4,83 +4,38 @@ using Abp.Application.Features;
 using Abp.Authorization.Roles;
 using Abp.Authorization.Users;
 using Abp.Domain.Repositories;
-using Abp.Modules;
 using Abp.MultiTenancy;
+using Abp.Runtime.Security;
+using Abp.Runtime.Session;
 using Abp.Zero.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using Abp.Authorization;
+using Abp.Configuration;
+using Abp.Dependency;
+using Abp.Domain.Uow;
+using Abp.Organizations;
+using Abp.Runtime.Caching;
+using Abp.Zero.Configuration;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AbpZeroLearn
 {
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            var bootstrapper = AbpBootstrapper.Create<MyStartupModule>();
-            bootstrapper.Initialize();
-            var iocManager = bootstrapper.IocManager;
-
-            var flag = iocManager.IsRegistered<AbpEditionManager>();
-
-            var tenantManager = iocManager.Resolve<TenantManager>();
-
-            var tenant = tenantManager.FindByTenancyName<Tenant,User>("test");
-
-            Console.WriteLine("Success");
-            Console.ReadLine();
-        }
-    }
-
-    public class MyDbContext : AbpZeroDbContext<Tenant, Role, User, MyDbContext>
-    {
-        public MyDbContext(DbContextOptions<MyDbContext> options)
-            : base(options)
-        {
+            CreateWebHostBuilder(args).Build().Run();
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.ChangeAbpTablePrefix<Tenant, Role, User>("");
-            base.OnModelCreating(modelBuilder);
-        }
-    }
-
-    public class User : AbpUser<User>
-    {
-
-    }
-
-    public class Role : AbpRole<User>
-    {
-
-    }
-
-    public class Tenant : AbpTenant<User>
-    {
-        public Tenant()
-            : base()
-        {
-
-        }
-        public Tenant(string tenancyName, string name)
-            : base(tenancyName, name)
-        {
-
-        }
-    }
-
-    public class TenantManager : AbpTenantManager<Tenant, User>
-    {
-        public TenantManager(
-            IRepository<Tenant> tenantRepository,
-            IRepository<TenantFeatureSetting, long> tenantFeatureRepository,
-            AbpEditionManager editionManager,
-            IAbpZeroFeatureValueStore featureValueStore)
-            : base(tenantRepository,
-                  tenantFeatureRepository,
-                  editionManager,
-                  featureValueStore)
-        {
-        }
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>();
     }
 }

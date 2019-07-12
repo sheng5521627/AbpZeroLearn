@@ -1,19 +1,26 @@
-﻿using Abp;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Abp;
 using Abp.Application.Features;
+using Abp.AspNetCore;
 using Abp.EntityFrameworkCore.Configuration;
 using Abp.Modules;
 using Abp.Runtime.Session;
 using Abp.Zero.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace AbpZeroLearn
+namespace ZeroWeb
 {
-    [DependsOn(typeof(AbpKernelModule), typeof(AbpZeroCoreEntityFrameworkCoreModule))]
+    [DependsOn(
+        typeof(AbpKernelModule),
+        typeof(AbpZeroCoreEntityFrameworkCoreModule),
+        typeof(AbpAspNetCoreModule))]
     public class MyStartupModule : AbpModule
     {
         public override void PreInitialize()
         {
-            IocManager.Register<IPrincipalAccessor, MyPrincipalAccessor>();
             Configuration.DefaultNameOrConnectionString = "server=127.0.0.1;database=lpw-test;uid=root;pwd=123456";
             base.PreInitialize();
         }
